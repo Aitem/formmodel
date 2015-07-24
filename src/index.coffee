@@ -18,13 +18,19 @@ coordinates_data = (d, k)->
 
 from_coordinates = (extensions)->
   c = coordinates(extensions)
-  latitude: coordinates_data(c, 'latitude').valueString
-  longitude: coordinates_data(c, 'longitude').valueString
+  [coordinates_data(c, 'latitude').valueString, coordinates_data(c, 'longitude').valueString]
 
 to_coordinates = (extensions, m)->
   c = coordinates(extensions)
-  coordinates_data(c, 'latitude').valueString = m.latitude
-  coordinates_data(c, 'longitude').valueString = m.longitude
+  unless c
+    c =
+      extension:[{url: 'latitude',},{url: 'longitude'}]
+      url: "http://zdrav.spb.ru"
+    unless typeof(extensions) == 'array'
+      extensions = []
+    extensions.push c
+  coordinates_data(c, 'latitude').valueString = m[0]
+  coordinates_data(c, 'longitude').valueString = m[1]
   extensions
 
 from_address = (v)->
@@ -34,6 +40,26 @@ to_address = (v, m)->
   v[0].text = m
   v
 
+orgtype = (d)->
+  k = "OrgType"
+  get_in(d, ['coding', ((x)-> get_in(x, ['system']) == k)])
+
+from_orgtype = (type)->
+  type = orgtype(type)
+  code: get_in(type, ['code'])
+  system: 'OrgType'
+  display: get_in(type, ['display'])
+
+to_orgtype = (type, m)->
+  t = orgtype(type)
+  unless t
+    t = {code:'', system:'', display:''}
+    type.coding.push t
+  t.code = m.code
+  t.system = 'OrgType'
+  t.display= m.display
+  type
+
 from = (o, m)->
   for k,v of o
     switch k
@@ -41,8 +67,10 @@ from = (o, m)->
         m.coordinates = from_coordinates(v)
       when 'address'
         m.address = from_address(v)
+      when 'type'
+        m.orgtype = from_orgtype(v)
       else
-        m[k] = v if ['string', 'number'].indexOf(typeof(v)) >= 0
+        m[k] = v
   m
 
 to = (o, m)->
@@ -52,11 +80,12 @@ to = (o, m)->
         o.extension = to_coordinates(o.extension, v)
       when 'address'
         o.address = to_address(o.address, v)
+      when 'orgtype'
+        o.type = to_orgtype(o.type, v)
       else
-        o[k] = v if ['string', 'number'].indexOf(typeof(v)) >= 0
+        o[k] = v
   o
 
 module.exports =
   from: from
   to: to
-

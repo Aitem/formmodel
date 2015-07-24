@@ -44,17 +44,11 @@ describe 'Test fromModel', ()->
         "url": "http://other data"
       ]
     m =
-      coordinates:
-        latitude: ''
-        longitude: ''
+      coordinates: ['','']
     res =
-      coordinates:
-        latitude: '59.831336'
-        longitude: '30.408996'
+      coordinates: ['59.831336', '30.408996']
     change =
-      coordinates:
-        latitude: '60'
-        longitude: '30'
+      coordinates: [ '60', '30']
 
     it '#Test geo FROM', ()->
       assert.deepEqual(fm.from(o, m), res)
@@ -73,14 +67,18 @@ describe 'Test fromModel', ()->
     res =
       name: 'Name before'
       numb: 5
+      obj:
+        foo: 'bar'
     change =
       name: 'Name after'
       numb: 7
+      obj:
+        foo: 'baz'
     newo =
       name: 'Name after'
       numb: 7
       obj:
-        foo: 'bar'
+        foo: 'baz'
 
     it '#Test From first level fields', ()->
       assert.deepEqual(fm.from(o, m), res)
@@ -101,6 +99,8 @@ describe 'Test fromModel', ()->
       address: 'Address before'
       name: ''
       numb: 5
+      obj:
+        foo: 'bar'
     change =
       address: 'Address after'
       name: 'Name after'
@@ -115,4 +115,47 @@ describe 'Test fromModel', ()->
     it '#Test FROM address', ()->
       assert.deepEqual(fm.from(o, m), res)
     it '#Test TO address', ()->
+      assert.deepEqual(fm.to(o, change), newo)
+  
+  describe '#Test OrgType', ()->
+    o =
+      type:
+        "coding": [
+            "display": "Гинекологические"
+            "system": "OrgType"
+            "code": "10293"
+          ,
+            "display": "Анкология"
+            "system": "OtherType"
+            "code": "10277"
+          ]
+    m =
+      orgtype:
+        code: ''
+        system: 'OrgType'
+        display: ''
+    res =
+      orgtype:
+        code: '10293'
+        system: 'OrgType'
+        display: "Гинекологические"
+    change =
+      orgtype:
+        code: '10999'
+        display: "Хирургия"
+    newo =
+      type:
+        "coding": [
+            "display": "Хирургия"
+            "system": "OrgType"
+            "code": "10999"
+          ,
+            "display": "Анкология"
+            "system": "OtherType"
+            "code": "10277"
+          ]
+
+    it '#Test FROM OrgType', ()->
+      assert.deepEqual(fm.from(o, m), res)
+    it '#Test TO OrgType', ()->
       assert.deepEqual(fm.to(o, change), newo)
