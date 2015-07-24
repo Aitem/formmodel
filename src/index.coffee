@@ -32,6 +32,8 @@ from = (o, m)->
     switch k
       when 'extension'
         m.coordinates = from_coordinates(v)
+      else
+        m[k] = v if ['string', 'number'].indexOf(typeof(v)) >= 0
   m
 
 to = (o, m)->
@@ -39,6 +41,8 @@ to = (o, m)->
     switch k
       when 'coordinates'
         o.extension = to_coordinates(o.extension, v)
+      else
+        o[k] = v if ['string', 'number'].indexOf(typeof(v)) >= 0
   o
 
 module.exports =
