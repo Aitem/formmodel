@@ -27,11 +27,20 @@ to_coordinates = (extensions, m)->
   coordinates_data(c, 'longitude').valueString = m.longitude
   extensions
 
+from_address = (v)->
+  v[0].text
+  
+to_address = (v, m)->
+  v[0].text = m
+  v
+
 from = (o, m)->
   for k,v of o
     switch k
       when 'extension'
         m.coordinates = from_coordinates(v)
+      when 'address'
+        m.address = from_address(v)
       else
         m[k] = v if ['string', 'number'].indexOf(typeof(v)) >= 0
   m
@@ -41,6 +50,8 @@ to = (o, m)->
     switch k
       when 'coordinates'
         o.extension = to_coordinates(o.extension, v)
+      when 'address'
+        o.address = to_address(o.address, v)
       else
         o[k] = v if ['string', 'number'].indexOf(typeof(v)) >= 0
   o

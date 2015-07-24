@@ -61,7 +61,7 @@ describe 'Test fromModel', ()->
     it '#Test geo TO', ()->
       assert.deepEqual(fm.to(o, change), newo)
 
-  describe '#Test single fields', ()->
+  describe '#Test string and number first level fields', ()->
     o =
       name: 'Name before'
       numb: 5
@@ -82,7 +82,37 @@ describe 'Test fromModel', ()->
       obj:
         foo: 'bar'
 
-    it '#Test FROM is exist', ()->
+    it '#Test From first level fields', ()->
       assert.deepEqual(fm.from(o, m), res)
-    it '#Test TO is exist', ()->
+    it '#Test TO first level fields', ()->
+      assert.deepEqual(fm.to(o, change), newo)
+  
+  describe '#Test address field', ()->
+    o =
+      address: [ text: 'Address before']
+      numb: 5
+      obj:
+        foo: 'bar'
+    m =
+      address: ''
+      name: ''
+      numb: ''
+    res =
+      address: 'Address before'
+      name: ''
+      numb: 5
+    change =
+      address: 'Address after'
+      name: 'Name after'
+      numb: 7
+    newo =
+      address: [ text: 'Address after']
+      name: 'Name after'
+      numb: 7
+      obj:
+        foo: 'bar'
+
+    it '#Test FROM address', ()->
+      assert.deepEqual(fm.from(o, m), res)
+    it '#Test TO address', ()->
       assert.deepEqual(fm.to(o, change), newo)
